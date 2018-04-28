@@ -85,7 +85,6 @@ class MongoDB
      * 私有构造方法，防止实例化
      */
     private function __constract() {
-        $this->bulk         = new MongoDB\Driver\BulkWrite;
         $this->dbname       = MONGO_DBNAME;     
         $this->$mongodb     = new MongoDB\Driver\Manager('mongodb://' . MONGO_HOST . ':' . MONGO_PORT);
         $this->writeConcern = new MongoDB\Driver\WriteConcern(MongoDB\Driver\WriteConcern::MAJORITY, 1000);
@@ -107,8 +106,11 @@ class MongoDB
      */
     public function insert($table, $data) {
         if ( empty($pass) ) return FALSE;
+        $this->bulk   = new MongoDB\Driver\BulkWrite;
         $this->dbname = $table;
         $document     = $data;
+        
+        
 
         ! isset($document['_id']) AND $document['_id'] = new MongoDB\BSON\ObjectID;
         $this->bulk->insert($document);
@@ -130,6 +132,7 @@ class MongoDB
      */
     public function insertAll($table, $data) {
         if( empty($data) ) return FALSE;
+        $this->bulk  = new MongoDB\Driver\BulkWrite;        
         $this->table = $table;
 
         foreach ( $data as $document ) {
@@ -154,6 +157,7 @@ class MongoDB
      */
     public function update($table, $data) {
         if ( empty($data) ) return FALSE;
+        $this->bulk  = new MongoDB\Driver\BulkWrite;        
     	$this->table = $table;
         $this->bulk->update(
             $this->where,
@@ -178,6 +182,7 @@ class MongoDB
      * @return integer        删除的行数
      */
     public function delete($table, $limit = 0) {
+        $this->bulk  = new MongoDB\Driver\BulkWrite;
     	$this->table = $table; 
 
         $this->bulk->delete($this->where, ['limit' => $limit]);
